@@ -22,19 +22,18 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    @Bean
+@Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
             .authorizeHttpRequests(auth -> auth
                 // Step 4a: add access control
-                // ...
+                .requestMatchers("/dashboard").hasRole("ADMIN") // Verrouille le dashboard
+                .anyRequest().permitAll() // Laisse le formulaire public
                 // Step 4a: end
-                .anyRequest().permitAll()
             )
             // Step 4b: Add login form
-            // ...
-            // Step 4b: End of login form configuration
-            
+            .formLogin(withDefaults()) // Active la page de connexion
+            // Step 4b: End
             .csrf((csrf) -> csrf
                 .ignoringRequestMatchers("/h2-console/**")
             )
