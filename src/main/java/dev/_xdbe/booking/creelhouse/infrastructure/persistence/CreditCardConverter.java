@@ -20,20 +20,25 @@ public class CreditCardConverter implements AttributeConverter<String, String> {
     @Autowired
     private CryptographyHelper cryptographyHelper;
 
-    @Override
+   @Override
     public String convertToDatabaseColumn(String attribute) {
-        // Step 7a: Encrypt the PAN before storing it in the database
-        return attribute;
-        // Step 7a: End of PAN encryption
+        // Step 7a: Chiffre le PAN avant stockage
+        if (attribute == null) return null;
+        return CryptographyHelper.encryptData(attribute);
+        // Step 7a: End
     }
 
     @Override
     public String convertToEntityAttribute(String dbData) {
-        // Step 7b: Decrypt the PAN when reading it from the database
-        String pan = dbData;
-        // Step 7b: End of PAN decryption
-        String maskedPanString = panMasking(pan);
-        return maskedPanString;
+        // Step 7b: Déchiffre le PAN puis applique le masque
+        if (dbData == null) return null;
+        
+        // On récupère la donnée en clair depuis le cipher
+        String decryptedPan = CryptographyHelper.decryptData(dbData);
+        
+        // On applique le masque (Step 6) sur la donnée déchiffrée
+        return panMasking(decryptedPan);
+        // Step 7b: End
     }
 
 private String panMasking(String pan) {
