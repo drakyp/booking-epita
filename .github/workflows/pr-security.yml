@@ -1,0 +1,20 @@
+name: Pull Request Security Check
+# Ce pipeline se déclenche UNIQUEMENT quand on fait une Pull Request
+on: [pull_request]
+
+jobs:
+  source-code-analysis:
+    runs-on: ubuntu-latest
+    # On utilise l'image Docker de Semgrep (Slide 25)
+    container:
+      image: returntocorp/semgrep:latest
+    steps:
+      # On télécharge le code avec un historique complet (fetch-depth: 0) pour pouvoir comparer
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # Le coeur de l'étape 3 : L'analyse DIFFÉRENTIELLE
+      - name: Run Semgrep Differential
+        # On compare le nouveau code avec l'ancien (base.sha)
+        run: semgrep scan --config .semgrep --baseline-commit ${{ github.event.pull_request.base.sha }} --error
