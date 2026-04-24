@@ -1,48 +1,44 @@
 name: security
-
-# Le déclencheur est tout seul
 on:
-  workflow_dispatch:
+  [cite_start]workflow_dispatch: # Permet de lancer le scan manuellement [cite: 95]
 
-# Les permissions sont à la racine (alignées tout à gauche)
 permissions:
-  actions: read
-  security-events: write
-  contents: read
+  [cite_start]actions: read # Requis pour lire les actions [cite: 97]
+  [cite_start]security-events: write # CRUCIAL : Permet d'écrire les alertes dans l'onglet Security [cite: 98]
+  [cite_start]contents: read # Permet de lire ton code [cite: 99]
 
-# Les jobs sont à la racine (alignés tout à gauche)
 jobs:
   dependencies-analysis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - [cite_start]uses: actions/checkout@v4 [cite: 99]
 
       - name: run osv-scanner
         uses: google/osv-scanner-action/osv-scanner-action@v1.9.0
         with:
           scan-args: |-
-            --format sarif
-            --output DependenciesAnalysis_Full.sarif
+            --format sarif # On demande du SARIF pour GitHub [cite: 107]
+            --output DependenciesAnalysis_Full.sarif # On nomme le fichier [cite: 108]
             ./
-        continue-on-error: true
+        [cite_start]continue-on-error: true # On continue pour pouvoir uploader le rapport [cite: 110]
 
-      - name: Upload OSV SARIF
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload OSV SARIF to Security Dashboard
+        [cite_start]uses: github/codeql-action/upload-sarif@v3 # L'action qui publie les alertes [cite: 113]
         with:
           sarif_file: DependenciesAnalysis_Full.sarif
 
   source-code-analysis:
     runs-on: ubuntu-latest
     container:
-      image: returntocorp/semgrep:latest
+      [cite_start]image: returntocorp/semgrep:latest # Utilise l'image Docker Semgrep [cite: 120]
     steps:
       - uses: actions/checkout@v4
 
       - name: run semgrep
-        run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif
+        [cite_start]run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif # Scan avec tes règles [cite: 124]
         continue-on-error: true
 
-      - name: Upload Semgrep SARIF
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Semgrep SARIF to Security Dashboard
+        [cite_start]uses: github/codeql-action/upload-sarif@v3 # Publication des alertes [cite: 127]
         with:
           sarif_file: SourceCodeAnalysis.sarif
