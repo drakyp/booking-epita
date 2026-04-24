@@ -17,13 +17,13 @@ jobs:
         with:
           scan-args: |-
             --format sarif
-            --output DependenciesAnalysis_Full.sarif
+            --output DependenciesAnalysisFull.sarif
             ./
         continue-on-error: true
-      - name: Upload OSV SARIF
+      - name: Send report to security dashboard
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: DependenciesAnalysis_Full.sarif
+          sarif_file: DependenciesAnalysisFull.sarif
 
   source-code-analysis:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
       - name: run semgrep
         run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif
         continue-on-error: true
-      - name: Upload Semgrep SARIF
+      - name: Send report to security dashboard
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: SourceCodeAnalysis.sarif
