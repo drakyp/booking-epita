@@ -40,3 +40,4 @@ tasks.named('test') {
 dependencyLocking {
     lockAllConfigurations()
 }
+implementation("xerces:xercesImpl:2.3.0")
