@@ -22,7 +22,7 @@ public class VulnerableController {
 
     @GetMapping("/xss-nouveau")
     public ResponseEntity<String> getNewXSS(@RequestParam String userInput) {
-        // Injection directe sans filtre : Semgrep va détester ça !
+        // Injection directe sans filtre 
         return new ResponseEntity<>("<h1>Bienvenue " + userInput + "</h1>", HttpStatus.OK);
     }
 }
