@@ -1,44 +1,40 @@
 name: security
 on:
-  [cite_start]workflow_dispatch: # Permet de lancer le scan manuellement [cite: 95]
+  workflow_dispatch:
 
 permissions:
-  [cite_start]actions: read # Requis pour lire les actions [cite: 97]
-  [cite_start]security-events: write # CRUCIAL : Permet d'écrire les alertes dans l'onglet Security [cite: 98]
-  [cite_start]contents: read # Permet de lire ton code [cite: 99]
+  actions: read
+  security-events: write
+  contents: read
 
 jobs:
   dependencies-analysis:
     runs-on: ubuntu-latest
     steps:
-      - [cite_start]uses: actions/checkout@v4 [cite: 99]
-
+      - uses: actions/checkout@v4
       - name: run osv-scanner
         uses: google/osv-scanner-action/osv-scanner-action@v1.9.0
         with:
           scan-args: |-
-            --format sarif # On demande du SARIF pour GitHub [cite: 107]
-            --output DependenciesAnalysis_Full.sarif # On nomme le fichier [cite: 108]
+            --format sarif
+            --output DependenciesAnalysis_Full.sarif
             ./
-        [cite_start]continue-on-error: true # On continue pour pouvoir uploader le rapport [cite: 110]
-
-      - name: Upload OSV SARIF to Security Dashboard
-        [cite_start]uses: github/codeql-action/upload-sarif@v3 # L'action qui publie les alertes [cite: 113]
+        continue-on-error: true
+      - name: Upload OSV SARIF
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: DependenciesAnalysis_Full.sarif
 
   source-code-analysis:
     runs-on: ubuntu-latest
     container:
-      [cite_start]image: returntocorp/semgrep:latest # Utilise l'image Docker Semgrep [cite: 120]
+      image: returntocorp/semgrep:latest
     steps:
       - uses: actions/checkout@v4
-
       - name: run semgrep
-        [cite_start]run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif # Scan avec tes règles [cite: 124]
+        run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif
         continue-on-error: true
-
-      - name: Upload Semgrep SARIF to Security Dashboard
-        [cite_start]uses: github/codeql-action/upload-sarif@v3 # Publication des alertes [cite: 127]
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: SourceCodeAnalysis.sarif
