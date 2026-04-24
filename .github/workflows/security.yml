@@ -1,7 +1,6 @@
 name: security
 on:
   workflow_dispatch:
-
     permissions:
       # Required to upload SARIF file to CodeQL.
       actions: read
@@ -15,7 +14,7 @@ on:
         runs-on: ubuntu-latest
     steps:
       # Étape obligatoire : le robot doit d'abord télécharger ton code
-      - uses: actions/checkout@v4 
+      - uses: actions/checkout@v4
 
       # Le scanner Google OSV (Slide 18)
       - name: run osv-scanner
