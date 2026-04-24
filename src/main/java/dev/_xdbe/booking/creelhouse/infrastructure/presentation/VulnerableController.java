@@ -19,4 +19,10 @@ public class VulnerableController {
                         htmlString,imageLocation);
 		return new ResponseEntity<>(payload, HttpStatus.OK);
 	}
+
+    @GetMapping("/xss-nouveau")
+    public ResponseEntity<String> getNewXSS(@RequestParam String userInput) {
+        // Injection directe sans filtre 
+        return new ResponseEntity<>("<h1>Bienvenue " + userInput + "</h1>", HttpStatus.OK);
+    }
 }
