@@ -1,22 +1,22 @@
 name: security
+
+# Le déclencheur est tout seul
 on:
   workflow_dispatch:
-    permissions:
-      # Required to upload SARIF file to CodeQL.
-      actions: read
-      # Require writing security events to upload SARIF file
-    security-events: write
-    # to fetch code (actions/checkout)
-    contents: read
 
-    jobs:
-      dependencies-analysis:
-        runs-on: ubuntu-latest
+# Les permissions sont à la racine (alignées tout à gauche)
+permissions:
+  actions: read
+  security-events: write
+  contents: read
+
+# Les jobs sont à la racine (alignés tout à gauche)
+jobs:
+  dependencies-analysis:
+    runs-on: ubuntu-latest
     steps:
-      # Étape obligatoire : le robot doit d'abord télécharger ton code
       - uses: actions/checkout@v4
 
-      # Le scanner Google OSV (Slide 18)
       - name: run osv-scanner
         uses: google/osv-scanner-action/osv-scanner-action@v1.9.0
         with:
@@ -26,26 +26,22 @@ on:
             ./
         continue-on-error: true
 
-        # Envoi du rapport à GitHub (Slide 18)
       - name: Upload OSV SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: DependenciesAnalysis_Full.sarif
 
-        source-code-analysis:
-          runs-on: ubuntu-latest
-          # On utilise un conteneur Docker spécialisé pour Semgrep (Slide 19)
-        container:
-          image: returntocorp/semgrep:latest
-        steps:
-          - uses: actions/checkout@v4
+  source-code-analysis:
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:latest
+    steps:
+      - uses: actions/checkout@v4
 
-          # Lancement de Semgrep avec tes règles (Slide 19)
       - name: run semgrep
         run: semgrep scan --config .semgrep --sarif --output SourceCodeAnalysis.sarif
         continue-on-error: true
 
-        # Envoi du rapport à GitHub (Slide 19)
       - name: Upload Semgrep SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
